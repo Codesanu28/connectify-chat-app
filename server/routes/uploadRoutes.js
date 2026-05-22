@@ -3,7 +3,8 @@ const express = require("express");
 const upload =
   require("../multer");
 
-const router = express.Router();
+const router =
+  express.Router();
 
 router.post(
   "/",
@@ -12,9 +13,11 @@ router.post(
 
     res.json({
       image:
-        `http://localhost:5000/uploads/${req.file.filename}`,
+        `https://connectify-backend-ax3m.onrender.com/uploads/${req.file.filename}`,
     });
+
   }
 );
 
-module.exports = router;
+module.exports =
+  router;
