@@ -14,8 +14,11 @@ import axios from "axios";
 
 import EmojiPicker from "emoji-picker-react";
 
+const BACKEND_URL =
+  "https://connectify-backend-ax3m.onrender.com";
+
 const socket = io(
-  "http://localhost:5000"
+  BACKEND_URL
 );
 
 function Chat() {
@@ -118,7 +121,7 @@ function Chat() {
       ]);
 
       await axios.post(
-        "http://localhost:5000/api/messages",
+        `${BACKEND_URL}/api/messages`,
         messageData
       );
 
@@ -143,7 +146,7 @@ function Chat() {
 
     const { data } =
       await axios.post(
-        "http://localhost:5000/api/upload",
+        `${BACKEND_URL}/api/upload`,
         formData
       );
 
@@ -169,7 +172,7 @@ function Chat() {
     ]);
 
     await axios.post(
-      "http://localhost:5000/api/messages",
+      `${BACKEND_URL}/api/messages`,
       imageMessage
     );
   };
@@ -181,7 +184,7 @@ function Chat() {
 
         const { data } =
           await axios.get(
-            "http://localhost:5000/api/messages"
+            `${BACKEND_URL}/api/messages`
           );
 
         setMessageList(data);
