@@ -18,7 +18,10 @@ const BACKEND_URL =
   "https://connectify-backend-ax3m.onrender.com";
 
 const socket = io(
-  BACKEND_URL
+  BACKEND_URL,
+  {
+    transports: ["websocket"],
+  }
 );
 
 function Chat() {
@@ -155,7 +158,8 @@ function Chat() {
 
       room: joinedRoom,
 
-      image: data.image,
+      image:
+        `${BACKEND_URL}${data.image}`,
 
       time:
         new Date().toLocaleTimeString(),
@@ -259,14 +263,11 @@ function Chat() {
     <div
       style={{
         display: "flex",
-
         height: "90vh",
-
         background:
           darkMode
             ? "#0f172a"
             : "#f3f4f6",
-
         color:
           darkMode
             ? "white"
@@ -277,14 +278,11 @@ function Chat() {
       <div
         style={{
           width: "25%",
-
           background:
             darkMode
               ? "#111827"
               : "#ffffff",
-
           padding: "20px",
-
           borderRight:
             darkMode
               ? "1px solid #374151"
@@ -304,46 +302,31 @@ function Chat() {
 
           <input
             type="text"
-
             placeholder="Enter Room"
-
             value={room}
-
             onChange={(e) =>
               setRoom(
                 e.target.value
               )
             }
-
             style={{
               width: "100%",
-
               padding: "10px",
-
               borderRadius: "8px",
-
               border: "none",
-
               marginBottom: "10px",
             }}
           />
 
           <button
             onClick={joinRoom}
-
             style={{
               width: "100%",
-
               padding: "10px",
-
               background: "#16a34a",
-
               color: "white",
-
               border: "none",
-
               borderRadius: "8px",
-
               cursor: "pointer",
             }}
           >
@@ -356,9 +339,7 @@ function Chat() {
                 marginTop: "10px",
               }}
             >
-              Joined:
-              {" "}
-              {joinedRoom}
+              Joined: {joinedRoom}
             </p>
           )}
 
@@ -375,12 +356,9 @@ function Chat() {
         <div
           style={{
             marginTop: "20px",
-
             display: "flex",
-
             flexDirection:
               "column",
-
             gap: "15px",
           }}
         >
@@ -401,15 +379,11 @@ function Chat() {
       <div
         style={{
           width: "75%",
-
           display: "flex",
-
           flexDirection:
             "column",
-
           justifyContent:
             "space-between",
-
           padding: "20px",
         }}
       >
@@ -417,13 +391,10 @@ function Chat() {
         <div
           style={{
             display: "flex",
-
             justifyContent:
               "space-between",
-
             alignItems:
               "center",
-
             marginBottom:
               "20px",
           }}
@@ -432,10 +403,8 @@ function Chat() {
           <div
             style={{
               display: "flex",
-
               alignItems:
                 "center",
-
               gap: "10px",
             }}
           >
@@ -448,12 +417,9 @@ function Chat() {
               }
               style={{
                 padding: "10px",
-
                 borderRadius:
                   "8px",
-
                 border: "none",
-
                 cursor: "pointer",
               }}
             >
@@ -463,8 +429,7 @@ function Chat() {
             </button>
 
             <h2>
-              Welcome,
-              {" "}
+              Welcome,{" "}
               {userInfo.name}
             </h2>
 
@@ -477,18 +442,14 @@ function Chat() {
             style={{
               padding:
                 "10px 20px",
-
               background:
                 "#dc2626",
-
               color: "white",
-
               border: "none",
-
               borderRadius:
                 "8px",
-
-              cursor: "pointer",
+              cursor:
+                "pointer",
             }}
           >
             Logout
@@ -499,7 +460,6 @@ function Chat() {
         <div
           style={{
             overflowY: "auto",
-
             flex: 1,
           }}
         >
@@ -512,17 +472,12 @@ function Chat() {
                 style={{
                   background:
                     "#2563eb",
-
                   padding: "12px",
-
                   margin: "10px 0",
-
                   borderRadius:
                     "10px",
-
                   width:
                     "fit-content",
-
                   maxWidth:
                     "60%",
                 }}
@@ -532,7 +487,6 @@ function Chat() {
                   style={{
                     fontWeight:
                       "bold",
-
                     marginBottom:
                       "5px",
                   }}
@@ -549,16 +503,12 @@ function Chat() {
                 {msg.image && (
                   <img
                     src={msg.image}
-
                     alt="chat"
-
                     style={{
                       width:
                         "220px",
-
                       borderRadius:
                         "10px",
-
                       marginTop:
                         "10px",
                     }}
@@ -588,26 +538,20 @@ function Chat() {
               style={{
                 color:
                   "#9ca3af",
-
                 marginBottom:
                   "10px",
               }}
             >
-              {typingUser}
-              {" "}
-              is typing...
+              {typingUser} is typing...
             </p>
           )}
 
           <div
             style={{
               display: "flex",
-
               gap: "10px",
-
               marginTop:
                 "20px",
-
               alignItems:
                 "center",
             }}
@@ -629,16 +573,12 @@ function Chat() {
                 style={{
                   padding:
                     "10px",
-
                   borderRadius:
                     "8px",
-
                   border:
                     "none",
-
                   cursor:
                     "pointer",
-
                   fontSize:
                     "20px",
                 }}
@@ -651,10 +591,8 @@ function Chat() {
                   style={{
                     position:
                       "absolute",
-
                     bottom:
                       "60px",
-
                     zIndex:
                       100,
                   }}
@@ -671,11 +609,9 @@ function Chat() {
 
             <input
               type="file"
-
               onChange={
                 uploadImage
               }
-
               style={{
                 color:
                   darkMode
@@ -686,11 +622,8 @@ function Chat() {
 
             <input
               type="text"
-
               placeholder="Type message..."
-
               value={message}
-
               onChange={(e) => {
 
                 setMessage(
@@ -716,16 +649,12 @@ function Chat() {
 
               style={{
                 flex: 1,
-
                 padding:
                   "12px",
-
                 borderRadius:
                   "8px",
-
                 border:
                   "none",
-
                 outline:
                   "none",
               }}
@@ -738,19 +667,14 @@ function Chat() {
               style={{
                 padding:
                   "12px 20px",
-
                 background:
                   "#2563eb",
-
                 color:
                   "white",
-
                 border:
                   "none",
-
                 borderRadius:
                   "8px",
-
                 cursor:
                   "pointer",
               }}
