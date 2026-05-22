@@ -176,11 +176,6 @@ function Chat() {
         imageMessage
       );
 
-      setMessageList((list) => [
-        ...list,
-        imageMessage,
-      ]);
-
       await axios.post(
         `${BACKEND_URL}/api/messages`,
         imageMessage
@@ -285,7 +280,7 @@ function Chat() {
     <div
       style={{
         display: "flex",
-        height: "90vh",
+        height: "100vh",
         background:
           darkMode
             ? "#0f172a"
@@ -299,7 +294,7 @@ function Chat() {
 
       <div
         style={{
-          width: "25%",
+          width: "280px",
           background:
             darkMode
               ? "#111827"
@@ -312,7 +307,14 @@ function Chat() {
         }}
       >
 
-        <h1>
+        <h1
+          style={{
+            fontSize: "32px",
+            fontWeight: "bold",
+            color: "#60a5fa",
+            marginBottom: "20px",
+          }}
+        >
           Connectify
         </h1>
 
@@ -337,6 +339,8 @@ function Chat() {
               borderRadius: "8px",
               border: "none",
               marginBottom: "10px",
+              background: "#1f2937",
+              color: "white",
             }}
           />
 
@@ -344,12 +348,13 @@ function Chat() {
             onClick={joinRoom}
             style={{
               width: "100%",
-              padding: "10px",
+              padding: "12px",
               background: "#16a34a",
               color: "white",
               border: "none",
-              borderRadius: "8px",
+              borderRadius: "10px",
               cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
             Join Room
@@ -360,6 +365,7 @@ function Chat() {
         <h2
           style={{
             marginTop: "40px",
+            marginBottom: "15px",
           }}
         >
           Online Users
@@ -367,11 +373,10 @@ function Chat() {
 
         <div
           style={{
-            marginTop: "20px",
             display: "flex",
             flexDirection:
               "column",
-            gap: "15px",
+            gap: "12px",
           }}
         >
 
@@ -417,6 +422,13 @@ function Chat() {
 
                 style={{
                   cursor: "pointer",
+                  padding: "10px",
+                  borderRadius: "10px",
+                  background:
+                    selectedUser ===
+                    user.username
+                      ? "#2563eb"
+                      : "#1f2937",
                 }}
               >
                 🟢 {user.username}
@@ -430,7 +442,7 @@ function Chat() {
 
       <div
         style={{
-          width: "75%",
+          flex: 1,
           display: "flex",
           flexDirection:
             "column",
@@ -489,9 +501,11 @@ function Chat() {
               border:
                 "none",
               borderRadius:
-                "8px",
+                "10px",
               cursor:
                 "pointer",
+              fontWeight:
+                "bold",
             }}
           >
             Logout
@@ -503,6 +517,10 @@ function Chat() {
           style={{
             overflowY: "auto",
             flex: 1,
+            padding: "10px",
+            display: "flex",
+            flexDirection:
+              "column",
           }}
         >
 
@@ -530,72 +548,119 @@ function Chat() {
                 <div
                   key={index}
                   style={{
-                    background:
-                      "#2563eb",
-                    padding: "12px",
-                    margin:
-                      "10px 0",
-                    borderRadius:
-                      "10px",
-                    width:
-                      "fit-content",
-                    maxWidth:
-                      "60%",
+                    display: "flex",
+
+                    justifyContent:
+                      msg.sender ===
+                      userInfo.name
+                        ? "flex-end"
+                        : "flex-start",
+
+                    margin: "10px 0",
                   }}
                 >
 
-                  <p
+                  <div
                     style={{
-                      fontWeight:
-                        "bold",
-                      marginBottom:
-                        "5px",
+                      background:
+                        msg.sender ===
+                        userInfo.name
+                          ? "#2563eb"
+                          : "#374151",
+
+                      padding: "12px",
+
+                      borderRadius:
+                        "12px",
+
+                      width:
+                        "fit-content",
+
+                      maxWidth:
+                        "70%",
+
+                      color:
+                        "white",
+
+                      boxShadow:
+                        "0px 2px 10px rgba(0,0,0,0.3)",
                     }}
                   >
-                    {msg.sender}
-                  </p>
 
-                  {msg.message && (
-                    <p>
-                      {msg.message}
-                    </p>
-                  )}
-
-                  {msg.image && (
-                    <img
-                      src={
-                        msg.image.startsWith(
-                          "http"
-                        )
-                          ? msg.image.replace(
-                              "http://localhost:5000",
-                              BACKEND_URL
-                            )
-                          : `${BACKEND_URL}${msg.image}`
-                      }
-
-                      alt="chat"
-
-                      onError={(e) => {
-                        e.target.style.display =
-                          "none";
-                      }}
-
+                    <p
                       style={{
-                        width: "220px",
-                        borderRadius:
-                          "10px",
-                        marginTop:
-                          "10px",
-                        objectFit:
-                          "cover",
-                      }}
-                    />
-                  )}
+                        fontWeight:
+                          "bold",
 
-                  <small>
-                    {msg.time}
-                  </small>
+                        marginBottom:
+                          "5px",
+                      }}
+                    >
+                      {msg.sender}
+                    </p>
+
+                    {msg.message && (
+                      <p
+                        style={{
+                          lineHeight:
+                            "22px",
+                        }}
+                      >
+                        {msg.message}
+                      </p>
+                    )}
+
+                    {msg.image && (
+                      <img
+                        src={
+                          msg.image.startsWith(
+                            "http"
+                          )
+                            ? msg.image.replace(
+                                "http://localhost:5000",
+                                BACKEND_URL
+                              )
+                            : `${BACKEND_URL}${msg.image}`
+                        }
+
+                        alt="chat"
+
+                        onError={(e) => {
+                          e.target.style.display =
+                            "none";
+                        }}
+
+                        style={{
+                          width: "220px",
+
+                          borderRadius:
+                            "10px",
+
+                          marginTop:
+                            "10px",
+
+                          objectFit:
+                            "cover",
+                        }}
+                      />
+                    )}
+
+                    <small
+                      style={{
+                        display:
+                          "block",
+
+                        marginTop:
+                          "8px",
+
+                        opacity:
+                          0.8,
+                      }}
+                    >
+                      {msg.time}
+                    </small>
+
+                  </div>
 
                 </div>
               )
@@ -630,10 +695,11 @@ function Chat() {
             style={{
               display: "flex",
               gap: "10px",
-              marginTop:
-                "20px",
-              alignItems:
-                "center",
+              marginTop: "20px",
+              alignItems: "center",
+              background: "#111827",
+              padding: "15px",
+              borderRadius: "12px",
             }}
           >
 
@@ -725,6 +791,12 @@ function Chat() {
                 flex: 1,
                 padding:
                   "12px",
+                background:
+                  "#1f2937",
+                color:
+                  "white",
+                fontSize:
+                  "16px",
                 borderRadius:
                   "8px",
                 border:
@@ -740,7 +812,7 @@ function Chat() {
               }
               style={{
                 padding:
-                  "12px 20px",
+                  "12px 22px",
                 background:
                   "#2563eb",
                 color:
@@ -748,9 +820,13 @@ function Chat() {
                 border:
                   "none",
                 borderRadius:
-                  "8px",
+                  "10px",
                 cursor:
                   "pointer",
+                fontWeight:
+                  "bold",
+                fontSize:
+                  "15px",
               }}
             >
               Send
