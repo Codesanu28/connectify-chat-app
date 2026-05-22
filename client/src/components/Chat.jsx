@@ -147,38 +147,44 @@ function Chat() {
       file
     );
 
-    const { data } =
-      await axios.post(
-        `${BACKEND_URL}/api/upload`,
-        formData
+    try {
+
+      const { data } =
+        await axios.post(
+          `${BACKEND_URL}/api/upload`,
+          formData
+        );
+
+      const imageMessage = {
+        sender: userInfo.name,
+
+        room: joinedRoom,
+
+        image:
+          `${BACKEND_URL}${data.image}`,
+
+        time:
+          new Date().toLocaleTimeString(),
+      };
+
+      socket.emit(
+        "send_message",
+        imageMessage
       );
 
-    const imageMessage = {
-      sender: userInfo.name,
+      await axios.post(
+        `${BACKEND_URL}/api/messages`,
+        imageMessage
+      );
 
-      room: joinedRoom,
+    } catch (error) {
 
-      image:
-        `${BACKEND_URL}${data.image}`,
+      console.log(error);
 
-      time:
-        new Date().toLocaleTimeString(),
-    };
-
-    socket.emit(
-      "send_message",
-      imageMessage
-    );
-
-    setMessageList((list) => [
-      ...list,
-      imageMessage,
-    ]);
-
-    await axios.post(
-      `${BACKEND_URL}/api/messages`,
-      imageMessage
-    );
+      alert(
+        "Image upload failed"
+      );
+    }
   };
 
   useEffect(() => {
@@ -500,26 +506,37 @@ function Chat() {
                   </p>
                 )}
 
-         {msg.image && (
-  <img
-    src={
-      msg.image.includes("localhost")
-        ? msg.image.replace(
-            "http://localhost:5000",
-            "https://connectify-backend-ax3m.onrender.com"
-          )
-        : msg.image
-    }
+                {msg.image && (
+                  <img
+                    src={
+                      msg.image.startsWith(
+                        "http"
+                      )
+                        ? msg.image.replace(
+                            "http://localhost:5000",
+                            BACKEND_URL
+                          )
+                        : `${BACKEND_URL}${msg.image}`
+                    }
 
-    alt="chat"
+                    alt="chat"
 
-    style={{
-      width: "220px",
-      borderRadius: "10px",
-      marginTop: "10px",
-    }}
-  />
-)}
+                    onError={(e) => {
+                      e.target.style.display =
+                        "none";
+                    }}
+
+                    style={{
+                      width: "220px",
+                      borderRadius:
+                        "10px",
+                      marginTop:
+                        "10px",
+                      objectFit:
+                        "cover",
+                    }}
+                  />
+                )}
 
                 <small>
                   {msg.time}
