@@ -160,8 +160,7 @@ function Chat() {
 
         room: joinedRoom,
 
-        image:
-          `${BACKEND_URL}${data.image}`,
+        image: data.image,
 
         time:
           new Date().toLocaleTimeString(),
@@ -192,12 +191,19 @@ function Chat() {
     const fetchMessages =
       async () => {
 
-        const { data } =
-          await axios.get(
-            `${BACKEND_URL}/api/messages`
-          );
+        try {
 
-        setMessageList(data);
+          const { data } =
+            await axios.get(
+              `${BACKEND_URL}/api/messages`
+            );
+
+          setMessageList(data);
+
+        } catch (error) {
+
+          console.log(error);
+        }
       };
 
     fetchMessages();
@@ -338,16 +344,6 @@ function Chat() {
           >
             Join Room
           </button>
-
-          {joinedRoom && (
-            <p
-              style={{
-                marginTop: "10px",
-              }}
-            >
-              Joined: {joinedRoom}
-            </p>
-          )}
 
         </div>
 
@@ -635,12 +631,6 @@ function Chat() {
               onChange={
                 uploadImage
               }
-              style={{
-                color:
-                  darkMode
-                    ? "white"
-                    : "black",
-              }}
             />
 
             <input
