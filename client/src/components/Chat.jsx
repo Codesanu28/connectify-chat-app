@@ -500,20 +500,26 @@ function Chat() {
                   </p>
                 )}
 
-                {msg.image && (
-                  <img
-                    src={msg.image}
-                    alt="chat"
-                    style={{
-                      width:
-                        "220px",
-                      borderRadius:
-                        "10px",
-                      marginTop:
-                        "10px",
-                    }}
-                  />
-                )}
+         {msg.image && (
+  <img
+    src={
+      msg.image.includes("localhost")
+        ? msg.image.replace(
+            "http://localhost:5000",
+            "https://connectify-backend-ax3m.onrender.com"
+          )
+        : msg.image
+    }
+
+    alt="chat"
+
+    style={{
+      width: "220px",
+      borderRadius: "10px",
+      marginTop: "10px",
+    }}
+  />
+)}
 
                 <small>
                   {msg.time}
