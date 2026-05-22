@@ -108,7 +108,8 @@ function Chat() {
       const messageData = {
         sender: userInfo.name,
 
-        room: joinedRoom,
+        room:
+          joinedRoom || "global",
 
         message,
 
@@ -161,7 +162,8 @@ function Chat() {
       const imageMessage = {
         sender: userInfo.name,
 
-        room: joinedRoom,
+        room:
+          joinedRoom || "global",
 
         image: data.image,
 
@@ -173,6 +175,11 @@ function Chat() {
         "send_message",
         imageMessage
       );
+
+      setMessageList((list) => [
+        ...list,
+        imageMessage,
+      ]);
 
       await axios.post(
         `${BACKEND_URL}/api/messages`,
@@ -500,10 +507,16 @@ function Chat() {
         >
 
           {messageList
+
             .filter((msg) => {
 
-              if (!joinedRoom)
-                return true;
+              if (!joinedRoom) {
+
+                return (
+                  msg.room ===
+                  "global"
+                );
+              }
 
               return (
                 msg.room ===
