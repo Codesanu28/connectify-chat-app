@@ -50,6 +50,9 @@ function Chat() {
   const [joinedRoom, setJoinedRoom] =
     useState("");
 
+  const [selectedUser, setSelectedUser] =
+    useState("");
+
   const messagesEndRef =
     useRef(null);
 
@@ -368,7 +371,47 @@ function Chat() {
           {onlineUsers.map(
             (user) => (
 
-              <p key={user.id}>
+              <p
+                key={user.id}
+
+                onClick={() => {
+
+                  if (
+                    user.username !==
+                    userInfo.name
+                  ) {
+
+                    const privateRoom =
+                      [
+                        userInfo.name,
+                        user.username,
+                      ]
+                        .sort()
+                        .join("-");
+
+                    setSelectedUser(
+                      user.username
+                    );
+
+                    setJoinedRoom(
+                      privateRoom
+                    );
+
+                    socket.emit(
+                      "join_room",
+                      privateRoom
+                    );
+
+                    alert(
+                      `Private chat with ${user.username}`
+                    );
+                  }
+                }}
+
+                style={{
+                  cursor: "pointer",
+                }}
+              >
                 🟢 {user.username}
               </p>
             )
@@ -402,38 +445,26 @@ function Chat() {
           }}
         >
 
-          <div
-            style={{
-              display: "flex",
-              alignItems:
-                "center",
-              gap: "10px",
-            }}
-          >
-
-            <button
-              onClick={() =>
-                setDarkMode(
-                  !darkMode
-                )
-              }
-              style={{
-                padding: "10px",
-                borderRadius:
-                  "8px",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              {darkMode
-                ? "☀️"
-                : "🌙"}
-            </button>
+          <div>
 
             <h2>
-              Welcome,{" "}
+              Welcome,
+              {" "}
               {userInfo.name}
             </h2>
+
+            {selectedUser && (
+              <p
+                style={{
+                  color: "#9ca3af",
+                  marginTop: "5px",
+                }}
+              >
+                Chatting with:
+                {" "}
+                {selectedUser}
+              </p>
+            )}
 
           </div>
 
@@ -446,8 +477,10 @@ function Chat() {
                 "10px 20px",
               background:
                 "#dc2626",
-              color: "white",
-              border: "none",
+              color:
+                "white",
+              border:
+                "none",
               borderRadius:
                 "8px",
               cursor:
@@ -466,81 +499,94 @@ function Chat() {
           }}
         >
 
-          {messageList.map(
-            (msg, index) => (
+          {messageList
+            .filter((msg) => {
 
-              <div
-                key={index}
-                style={{
-                  background:
-                    "#2563eb",
-                  padding: "12px",
-                  margin: "10px 0",
-                  borderRadius:
-                    "10px",
-                  width:
-                    "fit-content",
-                  maxWidth:
-                    "60%",
-                }}
-              >
+              if (!joinedRoom)
+                return true;
 
-                <p
+              return (
+                msg.room ===
+                joinedRoom
+              );
+            })
+
+            .map(
+              (msg, index) => (
+
+                <div
+                  key={index}
                   style={{
-                    fontWeight:
-                      "bold",
-                    marginBottom:
-                      "5px",
+                    background:
+                      "#2563eb",
+                    padding: "12px",
+                    margin:
+                      "10px 0",
+                    borderRadius:
+                      "10px",
+                    width:
+                      "fit-content",
+                    maxWidth:
+                      "60%",
                   }}
                 >
-                  {msg.sender}
-                </p>
 
-                {msg.message && (
-                  <p>
-                    {msg.message}
-                  </p>
-                )}
-
-                {msg.image && (
-                  <img
-                    src={
-                      msg.image.startsWith(
-                        "http"
-                      )
-                        ? msg.image.replace(
-                            "http://localhost:5000",
-                            BACKEND_URL
-                          )
-                        : `${BACKEND_URL}${msg.image}`
-                    }
-
-                    alt="chat"
-
-                    onError={(e) => {
-                      e.target.style.display =
-                        "none";
-                    }}
-
+                  <p
                     style={{
-                      width: "220px",
-                      borderRadius:
-                        "10px",
-                      marginTop:
-                        "10px",
-                      objectFit:
-                        "cover",
+                      fontWeight:
+                        "bold",
+                      marginBottom:
+                        "5px",
                     }}
-                  />
-                )}
+                  >
+                    {msg.sender}
+                  </p>
 
-                <small>
-                  {msg.time}
-                </small>
+                  {msg.message && (
+                    <p>
+                      {msg.message}
+                    </p>
+                  )}
 
-              </div>
-            )
-          )}
+                  {msg.image && (
+                    <img
+                      src={
+                        msg.image.startsWith(
+                          "http"
+                        )
+                          ? msg.image.replace(
+                              "http://localhost:5000",
+                              BACKEND_URL
+                            )
+                          : `${BACKEND_URL}${msg.image}`
+                      }
+
+                      alt="chat"
+
+                      onError={(e) => {
+                        e.target.style.display =
+                          "none";
+                      }}
+
+                      style={{
+                        width: "220px",
+                        borderRadius:
+                          "10px",
+                        marginTop:
+                          "10px",
+                        objectFit:
+                          "cover",
+                      }}
+                    />
+                  )}
+
+                  <small>
+                    {msg.time}
+                  </small>
+
+                </div>
+              )
+            )}
 
           <div
             ref={
@@ -561,7 +607,9 @@ function Chat() {
                   "10px",
               }}
             >
-              {typingUser} is typing...
+              {typingUser}
+              {" "}
+              is typing...
             </p>
           )}
 
