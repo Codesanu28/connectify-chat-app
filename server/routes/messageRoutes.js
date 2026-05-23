@@ -1,14 +1,25 @@
-const express = require("express");
+const express =
+  require("express");
+
+const router =
+  express.Router();
 
 const {
   saveMessage,
   getMessages,
-} = require("../controllers/messageController");
+} = require(
+  "../controllers/messageController"
+);
 
-const router = express.Router();
+router.post(
+  "/",
+  saveMessage
+);
 
-router.post("/", saveMessage);
+router.get(
+  "/",
+  getMessages
+);
 
-router.get("/", getMessages);
-
-module.exports = router;
+module.exports =
+  router;

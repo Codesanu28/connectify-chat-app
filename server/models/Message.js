@@ -1,11 +1,15 @@
-const mongoose = require("mongoose");
+const mongoose =
+  require("mongoose");
 
 const messageSchema =
-  mongoose.Schema(
+  new mongoose.Schema(
     {
       sender: {
         type: String,
-        required: true,
+      },
+
+      room: {
+        type: String,
       },
 
       message: {
@@ -19,15 +23,19 @@ const messageSchema =
       time: {
         type: String,
       },
+
+      status: {
+        type: String,
+        default: "Sent",
+      },
     },
     {
       timestamps: true,
     }
   );
 
-const Message = mongoose.model(
-  "Message",
-  messageSchema
-);
-
-module.exports = Message;
+module.exports =
+  mongoose.model(
+    "Message",
+    messageSchema
+  );

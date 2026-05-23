@@ -63,6 +63,24 @@ function Chat() {
     localStorage.getItem("userInfo")
   );
 
+  // NOTIFICATION SOUND
+  const notificationSound =
+    new Audio(
+      "https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3"
+    );
+
+  useEffect(() => {
+
+    if (
+      Notification.permission !==
+      "granted"
+    ) {
+
+      Notification.requestPermission();
+    }
+
+  }, []);
+
   const logoutHandler = () => {
 
     localStorage.removeItem(
@@ -99,6 +117,7 @@ function Chat() {
     );
   };
 
+  // SEND MESSAGE
   const sendMessage = async () => {
 
     if (
@@ -106,7 +125,12 @@ function Chat() {
     ) {
 
       const messageData = {
-        sender: userInfo.name,
+
+        _id:
+          Date.now().toString(),
+
+        sender:
+          userInfo.name,
 
         room:
           joinedRoom || "global",
@@ -115,6 +139,9 @@ function Chat() {
 
         time:
           new Date().toLocaleTimeString(),
+
+        status:
+          "Sent",
       };
 
       socket.emit(
@@ -133,10 +160,10 @@ function Chat() {
       );
 
       setMessage("");
-
     }
   };
 
+  // IMAGE UPLOAD
   const uploadImage = async (e) => {
 
     const file =
@@ -161,22 +188,36 @@ function Chat() {
         );
 
       const imageMessage = {
-        sender: userInfo.name,
+
+        _id:
+          Date.now().toString(),
+
+        sender:
+          userInfo.name,
 
         room:
           joinedRoom || "global",
 
         image:
-          `${BACKEND_URL}${data.image}`,
+          data.image,
 
         time:
           new Date().toLocaleTimeString(),
+
+        status:
+          "Sent",
       };
 
       socket.emit(
         "send_message",
         imageMessage
       );
+
+      // SENDER ALSO SEES IMAGE
+      setMessageList((list) => [
+        ...list,
+        imageMessage,
+      ]);
 
       await axios.post(
         `${BACKEND_URL}/api/messages`,
@@ -193,6 +234,7 @@ function Chat() {
     }
   };
 
+  // SOCKETS
   useEffect(() => {
 
     const fetchMessages =
@@ -227,20 +269,129 @@ function Chat() {
         setOnlineUsers(users);
       }
     );
+// RECEIVE MESSAGE
+socket.on(
+  "receive_message",
+  (data) => {
 
-    socket.on(
-      "receive_message",
-      (data) => {
+    setMessageList((list) => {
 
-        setMessageList((list) => [
-          ...list,
-          data,
-        ]);
+      // AVOID DUPLICATES
+      const exists =
+        list.find(
+          (msg) =>
+            msg._id === data._id
+        );
+
+      if (exists) {
+
+        return list.map(
+          (msg) =>
+            msg._id === data._id
+              ? data
+              : msg
+        );
       }
-    );
 
+      return [...list, data];
+    });
+
+    // RECEIVER ONLY
+    if (
+      data.sender !==
+      userInfo.name
+    ) {
+
+      
+      // SOUND
+      notificationSound.play();
+
+      // NOTIFICATION
+      if (
+        Notification.permission ===
+        "granted"
+      ) {
+
+        new Notification(
+          `${data.sender} sent a message`,
+          {
+            body:
+              data.message
+                || "📷 Image",
+          }
+        );
+      }
+
+      // DELIVERED
+      socket.emit(
+        "message_delivered",
+        {
+          room: data.room,
+          messageId:
+            data._id,
+        }
+      );
+
+      // SEEN
+      setTimeout(() => {
+
+        socket.emit(
+          "message_seen",
+          {
+            room: data.room,
+            messageId:
+              data._id,
+          }
+        );
+
+      }, 2000);
+    }
+  }
+);
+
+// DELIVERED
+socket.on(
+  "message_delivered",
+  ({ messageId }) => {
+
+    setMessageList((list) =>
+
+      list.map((msg) =>
+
+        msg._id === messageId
+          ? {
+              ...msg,
+              status:
+                "Delivered",
+            }
+          : msg
+      )
+    );
+  }
+);
+
+// SEEN
+socket.on(
+  "message_seen",
+  ({ messageId }) => {
+
+    setMessageList((list) =>
+
+      list.map((msg) =>
+
+        msg._id === messageId
+          ? {
+              ...msg,
+              status:
+                "Seen",
+            }
+          : msg
+      )
+    );
+  }
+);
     socket.on(
-      "typing",
+      "typing", 
       (name) => {
 
         setTypingUser(name);
@@ -266,10 +417,19 @@ function Chat() {
       socket.off(
         "typing"
       );
+
+      socket.off(
+        "message_delivered"
+      );
+
+      socket.off(
+        "message_seen"
+      );
     };
 
   }, []);
 
+  // AUTO SCROLL
   useEffect(() => {
 
     messagesEndRef.current?.scrollIntoView({
@@ -279,6 +439,7 @@ function Chat() {
   }, [messageList]);
 
   return (
+
     <div
       style={{
         display: "flex",
@@ -294,6 +455,8 @@ function Chat() {
       }}
     >
 
+      {/* SIDEBAR */}
+
       <div
         style={{
           width: "280px",
@@ -301,7 +464,9 @@ function Chat() {
             darkMode
               ? "#111827"
               : "#ffffff",
+
           padding: "20px",
+
           borderRight:
             darkMode
               ? "1px solid #374151"
@@ -329,12 +494,15 @@ function Chat() {
           <input
             type="text"
             placeholder="Enter Room"
+
             value={room}
+
             onChange={(e) =>
               setRoom(
                 e.target.value
               )
             }
+
             style={{
               width: "100%",
               padding: "10px",
@@ -348,6 +516,7 @@ function Chat() {
 
           <button
             onClick={joinRoom}
+
             style={{
               width: "100%",
               padding: "12px",
@@ -415,10 +584,6 @@ function Chat() {
                       "join_room",
                       privateRoom
                     );
-
-                    alert(
-                      `Private chat with ${user.username}`
-                    );
                   }
                 }}
 
@@ -426,6 +591,7 @@ function Chat() {
                   cursor: "pointer",
                   padding: "10px",
                   borderRadius: "10px",
+
                   background:
                     selectedUser ===
                     user.username
@@ -442,6 +608,8 @@ function Chat() {
 
       </div>
 
+      {/* CHAT AREA */}
+
       <div
         style={{
           flex: 1,
@@ -453,6 +621,8 @@ function Chat() {
           padding: "20px",
         }}
       >
+
+        {/* TOP */}
 
         <div
           style={{
@@ -475,6 +645,7 @@ function Chat() {
             </h2>
 
             {selectedUser && (
+
               <p
                 style={{
                   color: "#9ca3af",
@@ -493,19 +664,26 @@ function Chat() {
             onClick={
               logoutHandler
             }
+
             style={{
               padding:
                 "10px 20px",
+
               background:
                 "#dc2626",
+
               color:
                 "white",
+
               border:
                 "none",
+
               borderRadius:
                 "10px",
+
               cursor:
                 "pointer",
+
               fontWeight:
                 "bold",
             }}
@@ -514,6 +692,8 @@ function Chat() {
           </button>
 
         </div>
+
+        {/* MESSAGES */}
 
         <div
           style={{
@@ -545,10 +725,11 @@ function Chat() {
             })
 
             .map(
-              (msg, index) => (
+              (msg) => (
 
                 <div
-                  key={index}
+                 key={msg._id}
+
                   style={{
                     display: "flex",
 
@@ -564,6 +745,7 @@ function Chat() {
 
                   <div
                     style={{
+
                       background:
                         msg.sender ===
                         userInfo.name
@@ -593,7 +775,6 @@ function Chat() {
                       style={{
                         fontWeight:
                           "bold",
-
                         marginBottom:
                           "5px",
                       }}
@@ -602,6 +783,7 @@ function Chat() {
                     </p>
 
                     {msg.message && (
+
                       <p
                         style={{
                           lineHeight:
@@ -613,6 +795,7 @@ function Chat() {
                     )}
 
                     {msg.image && (
+
                       <img
                         src={msg.image}
 
@@ -623,7 +806,8 @@ function Chat() {
                           borderRadius: "12px",
                           marginTop: "10px",
                           objectFit: "cover",
-                          border: "2px solid #374151",
+                          border:
+                            "2px solid #374151",
                         }}
                       />
                     )}
@@ -638,9 +822,41 @@ function Chat() {
 
                         opacity:
                           0.8,
+
+                        fontSize:
+                          "12px",
                       }}
                     >
+
                       {msg.time}
+
+                      {msg.sender === userInfo.name && (
+
+                        <span
+                          style={{
+                            marginLeft: "5px",
+
+                            color:
+                              msg.status ===
+                              "Seen"
+                                ? "#38bdf8"
+                                : "white",
+                          }}
+                        >
+                          {
+                            msg.status ===
+                            "Sent"
+                              ? "✓"
+
+                            : msg.status ===
+                              "Delivered"
+                              ? "✓✓"
+
+                            : "✓✓"
+                          }
+                        </span>
+                      )}
+
                     </small>
 
                   </div>
@@ -649,17 +865,16 @@ function Chat() {
               )
             )}
 
-          <div
-            ref={
-              messagesEndRef
-            }
-          />
+          <div ref={messagesEndRef} />
 
         </div>
+
+        {/* INPUT */}
 
         <div>
 
           {typingUser && (
+
             <p
               style={{
                 color:
@@ -699,15 +914,20 @@ function Chat() {
                     !showPicker
                   )
                 }
+
                 style={{
                   padding:
                     "10px",
+
                   borderRadius:
                     "8px",
+
                   border:
                     "none",
+
                   cursor:
                     "pointer",
+
                   fontSize:
                     "20px",
                 }}
@@ -716,12 +936,15 @@ function Chat() {
               </button>
 
               {showPicker && (
+
                 <div
                   style={{
                     position:
                       "absolute",
+
                     bottom:
                       "60px",
+
                     zIndex:
                       100,
                   }}
@@ -745,8 +968,11 @@ function Chat() {
 
             <input
               type="text"
+
               placeholder="Type message..."
+
               value={message}
+
               onChange={(e) => {
 
                 setMessage(
@@ -774,16 +1000,22 @@ function Chat() {
                 flex: 1,
                 padding:
                   "12px",
+
                 background:
                   "#1f2937",
+
                 color:
                   "white",
+
                 fontSize:
                   "16px",
+
                 borderRadius:
                   "8px",
+
                 border:
                   "none",
+
                 outline:
                   "none",
               }}
@@ -793,21 +1025,29 @@ function Chat() {
               onClick={
                 sendMessage
               }
+
               style={{
                 padding:
                   "12px 22px",
+
                 background:
                   "#2563eb",
+
                 color:
                   "white",
+
                 border:
                   "none",
+
                 borderRadius:
                   "10px",
+
                 cursor:
                   "pointer",
+
                 fontWeight:
                   "bold",
+
                 fontSize:
                   "15px",
               }}

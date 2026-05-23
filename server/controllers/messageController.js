@@ -1,38 +1,77 @@
-const Message = require("../models/Message");
+const Message =
+  require("../models/Message");
 
-const saveMessage = async (
-  req,
-  res
-) => {
-  try {
-    const newMessage =
-      await Message.create(req.body);
+// SAVE MESSAGE
+const saveMessage =
+  async (req, res) => {
 
-    res.status(201).json(
-      newMessage
-    );
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+    try {
 
-const getMessages = async (
-  req,
-  res
-) => {
-  try {
-    const messages =
-      await Message.find();
+      console.log(
+        "BODY:",
+        req.body
+      );
 
-    res.json(messages);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+      const newMessage =
+        await Message.create({
+          sender:
+            req.body.sender,
+
+          room:
+            req.body.room,
+
+          message:
+            req.body.message || "",
+
+          image:
+            req.body.image || "",
+
+          time:
+            req.body.time || "",
+
+          status:
+            req.body.status || "Sent",
+        });
+
+      res.status(201).json(
+        newMessage
+      );
+
+    } catch (error) {
+
+      console.log(
+        "SAVE ERROR:",
+        error
+      );
+
+      res.status(500).json({
+        message:
+          error.message,
+      });
+    }
+  };
+
+// GET MESSAGES
+const getMessages =
+  async (req, res) => {
+
+    try {
+
+      const messages =
+        await Message.find();
+
+      res.json(messages);
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        message:
+          error.message,
+      });
+    }
+  };
 
 module.exports = {
   saveMessage,
