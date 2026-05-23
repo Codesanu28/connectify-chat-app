@@ -133,6 +133,7 @@ function Chat() {
       );
 
       setMessage("");
+
     }
   };
 
@@ -165,7 +166,8 @@ function Chat() {
         room:
           joinedRoom || "global",
 
-        image: data.image,
+        image:
+          `${BACKEND_URL}${data.image}`,
 
         time:
           new Date().toLocaleTimeString(),
@@ -612,35 +614,16 @@ function Chat() {
 
                     {msg.image && (
                       <img
-                        src={
-                          msg.image.startsWith(
-                            "http"
-                          )
-                            ? msg.image.replace(
-                                "http://localhost:5000",
-                                BACKEND_URL
-                              )
-                            : `${BACKEND_URL}${msg.image}`
-                        }
+                        src={msg.image}
 
                         alt="chat"
 
-                        onError={(e) => {
-                          e.target.style.display =
-                            "none";
-                        }}
-
                         style={{
                           width: "220px",
-
-                          borderRadius:
-                            "10px",
-
-                          marginTop:
-                            "10px",
-
-                          objectFit:
-                            "cover",
+                          borderRadius: "12px",
+                          marginTop: "10px",
+                          objectFit: "cover",
+                          border: "2px solid #374151",
                         }}
                       />
                     )}
