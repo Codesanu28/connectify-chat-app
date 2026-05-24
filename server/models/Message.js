@@ -19,7 +19,9 @@ const messageSchema =
       audio: {
         type: String,
       },
-
+      reply: {
+  type: Object,
+},
       room: {
         type: String,
       },
