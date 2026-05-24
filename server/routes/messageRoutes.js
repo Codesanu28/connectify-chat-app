@@ -7,18 +7,19 @@ const router =
 const {
   saveMessage,
   getMessages,
+  deleteMessage,
 } = require(
   "../controllers/messageController"
 );
 
-router.post(
-  "/",
-  saveMessage
-);
+router
+  .route("/")
+  .post(saveMessage)
+  .get(getMessages);
 
-router.get(
-  "/",
-  getMessages
+router.delete(
+  "/:id",
+  deleteMessage
 );
 
 module.exports =

@@ -70,7 +70,6 @@ let onlineUsers = [];
 io.on(
   "connection",
   (socket) => {
-
     console.log(
       "User Connected:",
       socket.id
@@ -82,7 +81,6 @@ io.on(
     socket.on(
       "join",
       (username) => {
-
         const userExists =
           onlineUsers.find(
             (user) =>
@@ -91,7 +89,6 @@ io.on(
           );
 
         if (!userExists) {
-
           onlineUsers.push({
             id: socket.id,
             username,
@@ -115,7 +112,6 @@ io.on(
     socket.on(
       "join_room",
       (room) => {
-
         socket.join(room);
 
         console.log(
@@ -130,7 +126,6 @@ io.on(
     socket.on(
       "typing",
       (name) => {
-
         socket.broadcast.emit(
           "typing",
           name
@@ -144,13 +139,11 @@ io.on(
     socket.on(
       "send_message",
       (data) => {
-
         console.log(
           "New Message:",
           data
         );
 
-        // SEND MESSAGE
         io.to(data.room).emit(
           "receive_message",
           {
@@ -160,7 +153,6 @@ io.on(
           }
         );
 
-        // DELIVERED STATUS
         io.to(data.room).emit(
           "message_delivered",
           {
@@ -180,7 +172,6 @@ io.on(
         room,
         messageId,
       }) => {
-
         io.to(room).emit(
           "message_delivered",
           {
@@ -199,7 +190,6 @@ io.on(
         room,
         messageId,
       }) => {
-
         io.to(room).emit(
           "message_seen",
           {
@@ -210,12 +200,24 @@ io.on(
     );
 
     // ======================
+    // DELETE MESSAGE
+    // ======================
+    socket.on(
+      "delete_message",
+      (messageId) => {
+        io.emit(
+          "message_deleted",
+          messageId
+        );
+      }
+    );
+
+    // ======================
     // DISCONNECT
     // ======================
     socket.on(
       "disconnect",
       () => {
-
         onlineUsers =
           onlineUsers.filter(
             (user) =>
@@ -240,7 +242,6 @@ io.on(
 app.get(
   "/",
   (req, res) => {
-
     res.send(
       "API Running Successfully"
     );
@@ -255,7 +256,6 @@ const PORT =
 server.listen(
   PORT,
   () => {
-
     console.log(
       `Server running on port ${PORT}`
     );

@@ -2,13 +2,9 @@ const mongoose =
   require("mongoose");
 
 const messageSchema =
-  new mongoose.Schema(
+  mongoose.Schema(
     {
       sender: {
-        type: String,
-      },
-
-      room: {
         type: String,
       },
 
@@ -19,9 +15,15 @@ const messageSchema =
       image: {
         type: String,
       },
-audio: {
-  type: String,
-},
+
+      audio: {
+        type: String,
+      },
+
+      room: {
+        type: String,
+      },
+
       time: {
         type: String,
       },
@@ -29,6 +31,11 @@ audio: {
       status: {
         type: String,
         default: "Sent",
+      },
+
+      createdAt: {
+        type: Date,
+        default: Date.now,
       },
     },
     {
