@@ -1,64 +1,98 @@
-const express = require("express");
+const express =
+  require("express");
 
-const router = express.Router();
+const router =
+  express.Router();
 
-const multer = require("multer");
+const multer =
+  require("multer");
 
-const path = require("path");
+const path =
+  require("path");
 
-const storage = multer.diskStorage({
+// STORAGE
+const storage =
+  multer.diskStorage({
 
-  destination: function (
-    req,
-    file,
-    cb
-  ) {
+    destination:
+      function (
+        req,
+        file,
+        cb
+      ) {
 
-    cb(null, "uploads/");
-  },
+        if (
+          file.fieldname ===
+          "audio"
+        ) {
 
-  filename: function (
-    req,
-    file,
-    cb
-  ) {
+          cb(
+            null,
+            "uploads/audio"
+          );
 
-    cb(
-      null,
-      Date.now() +
-        path.extname(
-          file.originalname
-        )
-    );
-  },
-});
+        } else {
 
-const upload = multer({
-  storage: storage,
-});
+          cb(
+            null,
+            "uploads/"
+          );
+        }
+      },
 
+    filename:
+      function (
+        req,
+        file,
+        cb
+      ) {
+
+        cb(
+          null,
+          Date.now() +
+            path.extname(
+              file.originalname
+            )
+        );
+      },
+  });
+
+const upload =
+  multer({ storage });
+
+// IMAGE UPLOAD
 router.post(
   "/",
   upload.single("image"),
   (req, res) => {
 
-    if (!req.file) {
-
-      return res
-        .status(400)
-        .json({
-          message:
-            "No file uploaded",
-        });
-    }
-
-    res.status(200).json({
-
+    res.json({
       image:
-        "/uploads/" +
-        req.file.filename,
+        `${req.protocol}://${req.get(
+          "host"
+        )}/uploads/${
+          req.file.filename
+        }`,
     });
   }
 );
 
-module.exports = router;
+// AUDIO UPLOAD
+router.post(
+  "/audio",
+  upload.single("audio"),
+  (req, res) => {
+
+    res.json({
+      audio:
+        `${req.protocol}://${req.get(
+          "host"
+        )}/uploads/audio/${
+          req.file.filename
+        }`,
+    });
+  }
+);
+
+module.exports =
+  router;

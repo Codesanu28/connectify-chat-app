@@ -19,7 +19,9 @@ const messageSchema =
       image: {
         type: String,
       },
-
+audio: {
+  type: String,
+},
       time: {
         type: String,
       },
